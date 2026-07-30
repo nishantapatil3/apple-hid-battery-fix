@@ -1,0 +1,23 @@
+[Unit]
+Description=Correct affected Apple Bluetooth HID battery percentages
+After=bluetooth.service
+Requires=bluetooth.service
+Before=upower.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/libexec/apple-hid-battery-override --keep-on-exit
+Restart=on-failure
+RestartSec=5
+User=root
+Group=root
+
+# Root opens mode-0600 hidraw nodes; CAP_SYS_ADMIN is needed for two
+# file-level bind mounts. Filesystem namespace isolation must stay disabled
+# so UPower can see those mounts.
+NoNewPrivileges=yes
+CapabilityBoundingSet=CAP_SYS_ADMIN
+RestrictAddressFamilies=AF_UNIX
+
+[Install]
+WantedBy=multi-user.target
